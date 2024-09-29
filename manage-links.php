@@ -60,6 +60,7 @@ include 'menu.php';
                                 <col width=""/>
                                 <col width="15%"/>
                                 <col width="10%"/>
+								<col width="11%"/><!-- 添加city选项 by 小布丁 2024.09.29-->
                                 <col width="12%"/>
                             </colgroup>
                             <thead>
@@ -69,6 +70,7 @@ include 'menu.php';
                                     <th><?php _e('友链地址'); ?></th>
                                     <th><?php _e('分类'); ?></th>
                                     <th><?php _e('图片'); ?></th>
+									<th><?php _e('城市'); ?></th><!-- 添加city选项 by 小布丁 2024.09.29-->
                                     <th><?php _e('状态'); ?></th>
                                 </tr>
                             </thead>
@@ -89,6 +91,7 @@ include 'menu.php';
                                             echo '<img class="avatar" src="'.$nopic_url.'" alt="NOPIC" width="32" height="32"/>';
                                         }
                                     ?></td>
+                                    <td><?php echo $link['city']; ?></td>
                                     <td><?php
                                         if ($link['state'] == 1) {
                                             echo '正常';
@@ -176,11 +179,13 @@ $('input[name="email"]').blur(function() {
         });
 
         <?php if (isset($request->lid)): ?>
-        $('.typecho-mini-panel').effect('highlight', '#AACB36');
+        $('.typecho-mini-panel').effect('highlight', '#aacb36');
         <?php endif; ?>
     });
 })();
+
 </script>
+
 <?php include 'footer.php'; ?>
 
 <?php /** Links by 懵仙兔兔 */ ?>
