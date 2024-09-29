@@ -5,10 +5,14 @@
  * 
  * @package Links
  * @author 懵仙兔兔
- * @version 1.2.7
+ * @version 1.2.8
  * @dependence 14.10.10-*
  * @link https://2dph.com
- * 
+ *
+ * version 1.2.8 at 2024-09-29 by 小布丁
+ * 数据库增加城市选项，用户可根据城市定义标签云
+ * 调整了友链链接框报警server error 以http:// 或者 https:// 开头
+ *
  * version 1.2.7 at 2024-06-21 by 泽泽社长
  * 解决php8.2一处报错问题
  * 
@@ -132,7 +136,7 @@ class Links_Plugin implements Typecho_Plugin_Interface
         echo '
 <ul class="typecho-option">
     <li>
-        <label class="typecho-label">管理】→【友情链接】进入操作页面</label>
+        <label class="typecho-label">【管理】→【友情链接】进入操作页面</label>
         <div class="Mejituu"><br>
             <center>
                 <div>
@@ -200,6 +204,10 @@ class Links_Plugin implements Typecho_Plugin_Interface
             <tr>
                 <td class="field">{image}</td>
                 <td>' . _t('友链图片') . '</td>
+            </tr>
+			 <tr>
+                <td class="field">{city}</td>
+                <td>' . _t('城市') . '</td>
             </tr>
             <tr>
                 <td class="field">{size}</td>
@@ -290,7 +298,7 @@ class Links_Plugin implements Typecho_Plugin_Interface
                 ('SQLite' == $type && ('HY000' == $code || 1 == $code))
             ) {
                 try {
-                    $script = 'SELECT `lid`, `name`, `url`, `sort`, `email`, `image`, `description`, `user`, `state`, `order` from `' . $prefix . 'links`';
+                    $script = 'SELECT `lid`, `name`, `url`, `sort`, `email`, `image`, `city`, `description`, `user`, `state`, `order` from `' . $prefix . 'links`';
                     $installDb->query($script, Typecho_Db::READ);
                     return _t('检测到友情链接数据表，友情链接插件启用成功');
                 } catch (Typecho_Db_Exception $e) {
@@ -345,7 +353,7 @@ class Links_Plugin implements Typecho_Plugin_Interface
         $form->addInput($name);
 
         /** 友链地址 */
-        $url = new Typecho_Widget_Helper_Form_Element_Text('url', null, "http://", _t('友链地址*'));
+        $url = new Typecho_Widget_Helper_Form_Element_Text('url', null, null, _t('友链地址*'),_t('需要以http://或https://开头.'));
         $form->addInput($url);
 
         /** 友链分类 */
@@ -359,6 +367,10 @@ class Links_Plugin implements Typecho_Plugin_Interface
         /** 友链图片 */
         $image = new Typecho_Widget_Helper_Form_Element_Text('image', null, null, _t('友链图片'),  _t('需要以http://或https://开头，留空表示没有友链图片'));
         $form->addInput($image);
+		
+		/** 友链城市 */
+        $city = new Typecho_Widget_Helper_Form_Element_Text('city', null, null, _t('友链城市'),  _t('填写友链城市'));
+        $form->addInput($city);
 
         /** 友链描述 */
         $description =  new Typecho_Widget_Helper_Form_Element_Textarea('description', null, null, _t('友链描述'));
@@ -387,6 +399,7 @@ class Links_Plugin implements Typecho_Plugin_Interface
         $form->addItem($submit);
         $request = Typecho_Request::getInstance();
 
+
         if (isset($request->lid) && 'insert' != $action) {
             /** 更新模式 */
             $db = Typecho_Db::get();
@@ -401,6 +414,7 @@ class Links_Plugin implements Typecho_Plugin_Interface
             $sort->value($link['sort']);
             $email->value($link['email']);
             $image->value($link['image']);
+			$city->value($link['city']);
             $description->value($link['description']);
             $user->value($link['user']);
             $state->value($link['state']);
@@ -430,6 +444,7 @@ class Links_Plugin implements Typecho_Plugin_Interface
             $sort->addRule('maxLength', _t('友链分类最多包含50个字符'), 50);
             $email->addRule('maxLength', _t('友链邮箱最多包含50个字符'), 50);
             $image->addRule('maxLength', _t('友链图片最多包含200个字符'), 200);
+			$city->addRule('maxLength', _t('友链城市最多包含200个字符'), 200);
             $description->addRule('maxLength', _t('友链描述最多包含200个字符'), 200);
             $user->addRule('maxLength', _t('自定义数据最多包含200个字符'), 200);
         }
@@ -494,8 +509,8 @@ class Links_Plugin implements Typecho_Plugin_Interface
             }
             if ($link['state'] == 1) {
                 $str .= str_replace(
-                    array('{lid}', '{name}', '{url}', '{sort}', '{title}', '{description}', '{image}', '{user}', '{size}'),
-                    array($link['lid'], $link['name'], $link['url'], $link['sort'], $link['description'], $link['description'], $link['image'], $link['user'], $size),
+                    array('{lid}', '{name}', '{url}', '{sort}', '{title}', '{description}', '{image}', '{city}', '{user}', '{size}'),
+                    array($link['lid'], $link['name'], $link['url'], $link['sort'], $link['description'], $link['description'], $link['image'], $link['city'], $link['user'], $size),
                     $pattern
                 );
             }
