@@ -16,6 +16,7 @@ class Links_Action extends Typecho_Widget implements Widget_Interface_Do
 
         /** 过滤XSS */
         $link['name'] = $this->request->filter('xss')->name;
+		$link['city'] = $this->request->filter('xss')->city;
         $link['sort'] = $this->request->filter('xss')->sort;
         $link['description'] = $this->request->filter('xss')->description;
         $link['user'] = $this->request->filter('xss')->user;
