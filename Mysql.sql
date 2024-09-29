@@ -5,6 +5,7 @@ CREATE TABLE `typecho_links` (
   `sort` varchar(50) DEFAULT NULL COMMENT 'links分类',
   `email` varchar(50) DEFAULT NULL COMMENT 'links邮箱',
   `image` varchar(200) DEFAULT NULL COMMENT 'links图片',
+  `city` varchar(200) DEFAULT NULL COMMENT 'links城市',
   `description` varchar(200) DEFAULT NULL COMMENT 'links描述',
   `user` varchar(200) DEFAULT NULL COMMENT '自定义',
   `state` int(10) DEFAULT '1' COMMENT 'links状态',
